@@ -60,7 +60,10 @@
       },
       {
         "tab": "Sandbox",
-        "asyncapi": "websocket.yaml"
+        "asyncapi": {
+          "source": "Websocket/asyncapi.yaml",
+          "directory": "Websocket"
+        }
       }
     ],
     "global": {
