@@ -1,0 +1,321 @@
+---
+title: "EWSO365_testing"
+description: "The new EWS O365 integration uses OAuth 2.0 protocol and can be used with Exchange Online and Office 365 &#40;mail&#41;."
+sidebarTitle: "EWSO365_testing"
+---
+
+## Overview
+
+The new EWS O365 integration uses OAuth 2.0 protocol and can be used with Exchange Online and Office 365 &#40;mail&#41;.
+
+<Note>
+**Content Type:** Integration
+</Note>
+
+## Integration Details
+
+| Property | Value |
+|----------|-------|
+| **Display Name** | EWSO365_testing |
+| **Category** | Email |
+
+## Configuration Parameters
+
+| Parameter | Required | Type | Description |
+|-----------|----------|------|-------------|
+| Azure Cloud | No | Select | More information about National clouds can be found here - https://xsoar.pan.dev/docs/reference/arti |
+| ID / Application ID | No | String | ID can be received from the admin consent procedure - see Detailed Instructions. |
+| Token / Tenant ID | No | String | Token can be received from the admin consent procedure - see Detailed Instructions. |
+|  | No | Auth | Key can be received from the admin consent procedure - see Detailed Instructions. |
+| Email Address | Yes | String | Mailbox to run commands on and to fetch incidents from. To use this functionality, your account must |
+| UPN Address | No | String | If this parameter is given, the commands will run with the UPN mailbox instead of the default target |
+| Name of the folder from which to fetch incidents | Yes | String | Supports Exchange Folder ID and sub-folders e.g. Inbox/Phishing. |
+| Access Type | No | Select |  |
+| Public Folder | No | Boolean |  |
+| Fetch incidents | No | Boolean |  |
+| Incident type | No | Number |  |
+| First fetch timestamp &#40;&lt;number&gt; &lt;time unit&gt;, e.g., 12 hours, 7 days&#41; | No | String |  |
+| Maximum number of incidents per fetch &#40;up to 200&#41;. Performance might be affected by a value higher than 50. | No | String |  |
+| Mark fetched emails as read | No | Boolean |  |
+| Timeout &#40;in seconds&#41; for HTTP requests to Exchange Server | No | String |  |
+| Trust any certificate &#40;not secure&#41; | No | Boolean |  |
+| Use system proxy settings | No | Boolean |  |
+| Run as a separate process &#40;protects against memory depletion&#41; | No | Boolean |  |
+| Use a self deployed Azure Application | No | Boolean | Select this checkbox if you are using a self-deployed Azure application. |
+| ID / Application ID &#40;Deprecated&#41; | No | Encrypted | Use the "ID" parameter instead. |
+| Token / Tenant ID &#40;Deprecated&#41; | No | Encrypted | Use the "Token" parameter instead. |
+| Key / Application Secret &#40;Deprecated&#41; | No | Encrypted | Use the "Key" parameter instead. |
+| Incidents Fetch Interval | No | String |  |
+| What time field should we filter incidents by? | No | Select | Default is to filter by received-time, which works well if the folder is an "Inbox". But for a folde |
+| Use legacy attachment name | No | Boolean |  |
+
+## Commands
+
+<AccordionGroup>
+  <Accordion title="!ews-get-attachment" icon="terminal">
+
+    Retrieves the actual attachments from an item &#40;email message&#41;. To get all attachments for a message, only specify the item-id argument.
+
+    **Arguments:**
+
+    - `item-id` *(required)*
+    - `target-mailbox`
+    - `attachment-ids`
+
+  </Accordion>
+  <Accordion title="!ews-delete-attachment" icon="terminal">
+
+    Deletes the attachments of an item &#40;email message&#41;.
+
+    **Arguments:**
+
+    - `item-id` *(required)*
+    - `target-mailbox`
+    - `attachment-ids`
+
+  </Accordion>
+  <Accordion title="!ews-get-searchable-mailboxes" icon="terminal">
+
+    Returns a list of searchable mailboxes. This command requires eDiscovery permissions to the Exchange Server. For more information, see the EWSv2 integration documentation.
+
+  </Accordion>
+  <Accordion title="!ews-move-item" icon="terminal">
+
+    Move an item to different folder in the mailbox.
+
+    **Arguments:**
+
+    - `item-id` *(required)*
+    - `target-folder-path` *(required)*
+    - `target-mailbox`
+    - `is-public`
+
+  </Accordion>
+  <Accordion title="!ews-delete-items" icon="terminal">
+
+    Delete items from mailbox.
+
+    **Arguments:**
+
+    - `item-ids` *(required)*
+    - `delete-type` *(required)*
+    - `target-mailbox`
+
+  </Accordion>
+  <Accordion title="!ews-search-mailbox" icon="terminal">
+
+    Searches for items in the specified mailbox. Specific permissions are needed for this operation to search in a target mailbox other than the default.
+
+    **Arguments:**
+
+    - `query`
+    - `folder-path`
+    - `limit`
+    - `target-mailbox`
+    - `is-public`
+    - `message-id`
+    - `selected-fields`
+
+  </Accordion>
+  <Accordion title="!ews-get-contacts" icon="terminal">
+
+    Retrieves contacts for a specified mailbox.
+
+    **Arguments:**
+
+    - `target-mailbox`
+    - `limit`
+
+  </Accordion>
+  <Accordion title="!ews-get-out-of-office" icon="terminal">
+
+    Retrieves the out-of-office status for a specified mailbox.
+
+    **Arguments:**
+
+    - `target-mailbox` *(required)*
+
+  </Accordion>
+  <Accordion title="!ews-recover-messages" icon="terminal">
+
+    Recovers messages that were soft-deleted.
+
+    **Arguments:**
+
+    - `message-ids` *(required)*
+    - `target-folder-path` *(required)*
+    - `target-mailbox`
+    - `is-public`
+
+  </Accordion>
+  <Accordion title="!ews-create-folder" icon="terminal">
+
+    Creates a new folder in a specified mailbox.
+
+    **Arguments:**
+
+    - `new-folder-name` *(required)*
+    - `folder-path` *(required)*
+    - `target-mailbox`
+
+  </Accordion>
+  <Accordion title="!ews-mark-item-as-junk" icon="terminal">
+
+    Marks an item as junk. This is commonly used to block an email address. For more information, see the Microsoft documentation: https://msdn.microsoft.com/en-us/library/office/dn481311&#40;v=exchg.150&#41;.aspx.
+
+    **Arguments:**
+
+    - `item-id` *(required)*
+    - `move-items`
+    - `target-mailbox`
+
+  </Accordion>
+  <Accordion title="!ews-find-folders" icon="terminal">
+
+    Retrieves information for folders for a specified mailbox. Only folders with read permissions will be returned. Your visual folders on the mailbox, such as "Inbox", are under the folder "Top of Information Store".
+
+    **Arguments:**
+
+    - `target-mailbox`
+
+  </Accordion>
+  <Accordion title="!ews-get-items-from-folder" icon="terminal">
+
+    Retrieves items from a specified folder in a mailbox. The items are order by the item created time, most recent is first.
+
+    **Arguments:**
+
+    - `folder-path` *(required)*
+    - `limit`
+    - `target-mailbox`
+    - `is-public`
+    - `get-internal-item`
+
+  </Accordion>
+  <Accordion title="!ews-get-items" icon="terminal">
+
+    Retrieves items by item ID.
+
+    **Arguments:**
+
+    - `item-ids` *(required)*
+    - `target-mailbox`
+
+  </Accordion>
+  <Accordion title="!ews-move-item-between-mailboxes" icon="terminal">
+
+    Moves an item from one mailbox to different mailbox.
+
+    **Arguments:**
+
+    - `item-id` *(required)*
+    - `destination-folder-path` *(required)*
+    - `destination-mailbox` *(required)*
+    - `source-mailbox`
+    - `is-public`
+
+  </Accordion>
+  <Accordion title="!ews-get-folder" icon="terminal">
+
+    Retrieves a single folder.
+
+    **Arguments:**
+
+    - `target-mailbox`
+    - `folder-path`
+    - `is-public`
+
+  </Accordion>
+  <Accordion title="!ews-expand-group" icon="terminal">
+
+    Expands a distribution list to display all members. By default, expands only first layer of the distribution list. If recursive-expansion is "True", the command expands nested distribution lists and returns all members.
+
+    **Arguments:**
+
+    - `email-address` *(required)*
+    - `recursive-expansion`
+
+  </Accordion>
+  <Accordion title="!ews-mark-items-as-read" icon="terminal">
+
+    Marks items as read or unread.
+
+    **Arguments:**
+
+    - `item-ids` *(required)*
+    - `operation`
+    - `target-mailbox`
+
+  </Accordion>
+  <Accordion title="!ews-get-items-as-eml" icon="terminal">
+
+    Retrieves items by item ID and uploads its content as an EML file.
+
+    **Arguments:**
+
+    - `item-id` *(required)*
+    - `target-mailbox`
+
+  </Accordion>
+  <Accordion title="!send-mail" icon="terminal">
+
+    Sends an email.
+
+    **Arguments:**
+
+    - `to`
+    - `cc`
+    - `bcc`
+    - `subject`
+    - `body`
+    - `htmlBody`
+    - `attachIDs`
+    - `attachNames`
+    - `attachCIDs`
+    - `transientFile`
+    - `transientFileContent`
+    - `transientFileCID`
+    - `templateParams`
+    - `additionalHeader`
+    - `raw_message`
+    - `from`
+    - `replyTo`
+    - `importance`
+
+  </Accordion>
+  <Accordion title="... and 2 more commands" icon="ellipsis">
+  </Accordion>
+</AccordionGroup>
+
+## Setup Instructions
+
+## Set up the Third Party System
+
+There are two application authentication methods available.
+Follow your preferred method's guide on how to use the admin consent flow in order to receive your authentication information:
+
+* [Cortex XSOAR Application](https://xsoar.pan.dev/docs/reference/articles/microsoft-integrations---authentication#cortex-xsoar-application)
+    To allow access to EWS O365, an administrator has to approve the Demisto app using an admin consent flow, by clicking on the following [link](https://oproxy.demisto.ninja/ms-ews-o365).
+    After authorizing the Demisto app, you will get an ID, Token, and Key, which needs to be added to the integration instance configuration's corresponding fields.
+
+* [Self-Deployed Application](https://xsoar.pan.dev/docs/reference/articles/microsoft-integrations---authentication#self-deployed-application) - Client Credential Flow.
+
+## Permissions Needed
+
+In order to function as expected, set the following permissions:
+
+**Impersonation rights** to the service account.
+**eDiscovery** permissions to the Exchange Server.
+**full_access_as_app** to the _application used for authentication_.
+
+Fore more information check the [documentation](https://xsoar.pan.dev/docs/reference/integrations/ewso365)
+
+---
+[View Integration Documentation](https://xsoar.pan.dev/docs/reference/integrations/ewso365)
+
+## Metadata
+
+| Property | Value |
+|----------|-------|
+| **ID** | `EWSO365_testing` |
+| **Type** | Integration |

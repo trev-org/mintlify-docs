@@ -1,0 +1,276 @@
+---
+title: "PS - Subplaybook: ScheduledJob Supplier Response Check"
+description: "Automates security operations using EWSO365_testing"
+sidebarTitle: "PS - Subplaybook: ScheduledJob Suppli..."
+---
+
+## Overview
+
+This playbook automates security operations and response workflows.
+
+**Integrations used:** EWSO365_testing
+
+**Workflow characteristics:** 2 manual decision point(s)
+
+<CardGroup cols={3}>
+  <Card title="Integrations" icon="plug">
+    1 integration(s) required
+  </Card>
+  <Card title="Commands" icon="terminal">
+    4 unique command(s)
+  </Card>
+  <Card title="Manual Tasks" icon="user">
+    2 decision point(s)
+  </Card>
+  <Card title="Total Tasks" icon="list-check">
+    7 automated step(s)
+  </Card>
+</CardGroup>
+
+## Visual Flow
+
+### Overview
+
+<Note>
+The diagram below shows the high-level flow of this playbook. Decision points are shown as diamonds, and parallel branches are indicated where tasks split.
+</Note>
+
+````mermaid
+graph TD
+    0(["Start"])
+    4[\"Extract Supplier Email"/]
+    5[\"Extract Sent Date"/]
+    2["Search Mailbox "]
+    8{"Do we have a reply?"}
+    12["Remove Supplier Email, Key-Value Pair to"]
+    13(("Done"))
+    11["Send Supplier Email"]
+    14["Append to Supplier Email Not Received Fi"]
+    0 --> 4
+    4 --> 5
+    5 --> 2
+    2 --> 8
+    8 -->|Otherwise| 11
+    8 -->|Yes| 12
+    12 --> 13
+    11 --> 14
+    14 --> 13
+````
+
+### Conditional Branches
+
+<Info>
+Each decision point in the playbook is detailed below with its branch logic and downstream tasks.
+</Info>
+
+<AccordionGroup>
+  <Accordion title="Do we have a reply?" icon="code-branch">
+
+````mermaid
+graph TD
+    8{"Do we have a reply?"}
+    12["Remove Supplier Email, Key-Value Pair to"]
+    13(("Done"))
+    14["Append to Supplier Email Not Received Fi"]
+    11["Send Supplier Email"]
+    8 -->|Otherwise| 11
+    8 -->|Yes| 12
+    12 --> 13
+    14 --> 13
+    11 --> 14
+    style 8 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Send Supplier Email
+    - **Yes:** Remove Supplier Email, Key-Value Pair to List
+
+  </Accordion>
+</AccordionGroup>
+
+## Prerequisites
+
+### Required Integrations
+
+<Warning>
+The following integrations must be configured and enabled before running this playbook:
+</Warning>
+
+- **EWSO365_testing**
+
+<Tip>
+Verify integration health in **Settings → Integrations** before execution.
+</Tip>
+
+## Inputs
+
+<Info>
+Configure these inputs when running the playbook to customize its behavior.
+</Info>
+
+| Name | Required | Type | Description | Default Source |
+|------|----------|------|-------------|----------------|
+| `List Entry` | ✅ Yes | string | *No description provided* | - |
+| `Today's Date` | ✅ Yes | string | *No description provided* | - |
+
+## Workflow
+
+<Steps>
+  <Step title="Extract Supplier Email" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Set a value in context under the key you entered.
+
+    **Executes Script:** `Set`
+
+    <Accordion title="Script Arguments (2)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `key` | `Supplier Email` |
+    | `value` | `inputs.List Entry` → `RegexExtractAll(error_if_no_match={})` → `trim()` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Extract Sent Date" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Set a value in context under the key you entered.
+
+    **Executes Script:** `Set`
+
+    <Accordion title="Script Arguments (2)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `key` | `Sent Date` |
+    | `value` | `inputs.List Entry` → `RegexExtractAll(error_if_no_match={})` → `trim()` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Search Mailbox" icon="terminal">
+    Searches for items in the specified mailbox. Specific permissions are needed for this operation to search in a target mailbox other than the default.
+
+    **Executes Command:** `!ews-search-mailbox`
+    **Integration:** EWSO365_testing
+    **Full Path:** `EWSO365_testing|||ews-search-mailbox`
+
+    <Accordion title="Command Arguments (2)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `limit` | `3` |
+    | `query` | `from:"${Supplier Email}" received:${Sent Date}..${inputs.Today\'s Date}` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Do we have a reply?" icon="code-branch">
+    <Tabs>
+      <Tab title="Otherwise">
+        **Proceeds to:** Send Supplier Email
+      </Tab>
+      <Tab title="Yes">
+        **Proceeds to:** Remove Supplier Email, Key-Value Pair to List
+      </Tab>
+    </Tabs>
+
+    <Accordion title="Condition Logic Details" icon="code">
+
+    **Branch: yes**
+
+    - `EWS.Items` **is not empty**
+
+    </Accordion>
+
+  </Step>
+  <Step title="Remove Supplier Email, Key-Value Pair to List" icon="terminal">
+    commands.local.cmd.list.remove
+
+    **Executes Command:** `!removeFromList`
+    **Full Path:** `Builtin|||removeFromList`
+
+    <Accordion title="Command Arguments (2)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `listData` | `{${Supplier Email}: ${Sent Date}}` |
+    | `listName` | `CSIRT Suppliers Email Communication` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Send Supplier Email" icon="terminal">
+    Sends an email.
+
+    **Executes Command:** `!send-mail`
+    **Integration:** EWSO365_testing
+    **Full Path:** `EWSO365_testing|||send-mail`
+
+    <Accordion title="Command Arguments (3)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `body` | `Hi,    CSIRT would like to follow up on MDLZ CSIRT's previous communication. We have not yet received a response on the requested information.   Responses to our questions will help us understand if there is any concern or impact to MDLZ data and systems as a result of the incident experienced.    We eagerly await your responses to these questions. If it is better to have a call and discuss please let us know, we would be happy to facilitate a conversation.   Thank you,   MDLZ CSIRT` |
+    | `subject` | `Test Email for No Reply` |
+    | `to` | `${Supplier Email}` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Append to Supplier Email Not Received Field" icon="terminal">
+    commands.local.cmd.set.incident
+
+    **Executes Command:** `!setIncident`
+    **Full Path:** `Builtin|||setIncident`
+
+    <Accordion title="Command Arguments (1)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `suppliernoresponsereceived` | `incident.suppliernoresponsereceived` → `append(item={'value': {'simple': '${Supplier Email}'}, 'iscontext': True})` → `join(separator={'value': {'simple': ','}})` +2 |
+
+    </Accordion>
+
+  </Step>
+</Steps>
+
+## Integration Commands Reference
+
+<Note>
+This playbook executes the following integration commands:
+</Note>
+
+### EWSO365_testing
+
+- `!ews-search-mailbox`
+- `!send-mail`
+
+## Related Resources
+
+<CardGroup cols={1}>
+  <Card title="EWSO365_testing Integration" icon="plug">
+    Configure and manage the EWSO365_testing integration
+  </Card>
+</CardGroup>
+
+<Tip>
+For more information about XSOAR playbooks and automation, refer to the [Cortex XSOAR Documentation](https://docs-cortex.paloaltonetworks.com/)
+</Tip>
+
+## Playbook Metadata
+
+| Property | Value |
+|----------|-------|
+| **Playbook ID** | `0a7dbda8-4a8b-49ea-8ce6-d5ebc0b8b9c2` |
+| **Playbook Version** | 51 |
+| **Total Tasks** | 7 |
+| **Automated Steps** | 5 |
+| **Manual Decision Points** | 2 |

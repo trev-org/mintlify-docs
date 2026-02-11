@@ -1,0 +1,293 @@
+---
+title: "PS - ScheduledJob: Supplier Response Check"
+description: "Automates security operations using EWSO365_testing"
+sidebarTitle: "PS - ScheduledJob: Supplier Response ..."
+---
+
+## Overview
+
+This playbook automates security operations and response workflows.
+
+**Integrations used:** EWSO365_testing
+
+**Workflow characteristics:** 3 manual decision point(s), 1 sub-playbook(s)
+
+<CardGroup cols={3}>
+  <Card title="Integrations" icon="plug">
+    1 integration(s) required
+  </Card>
+  <Card title="Sub-Playbooks" icon="diagram-project">
+    1 nested playbook(s)
+  </Card>
+  <Card title="Commands" icon="terminal">
+    3 unique command(s)
+  </Card>
+  <Card title="Manual Tasks" icon="user">
+    3 decision point(s)
+  </Card>
+  <Card title="Total Tasks" icon="list-check">
+    9 automated step(s)
+  </Card>
+</CardGroup>
+
+## Visual Flow
+
+### Overview
+
+<Note>
+The diagram below shows the high-level flow of this playbook. Decision points are shown as diamonds, and parallel branches are indicated where tasks split.
+</Note>
+
+````mermaid
+graph TD
+    0(["Start"])
+    10["Initiate Incident Fields"]
+    2[\"Get Supplier Email "/]
+    5[\"Get Today's Date"/]
+    6[\"Format Today's Date"/]
+    4[/"PS - Subplaybook: ScheduledJob Supplier "\]
+    11{"Are there suppliers we didn't receive a "}
+    7["Send Email Receipt "]
+    9(("Done"))
+    12["Set Supplier Incident Field to 'N/A'"]
+    0 --> 10
+    10 --> 2
+    2 --> 5
+    5 --> 6
+    6 --> 4
+    4 --> 11
+    11 -->|Otherwise| 12
+    11 -->|Yes| 7
+    7 --> 9
+    12 --> 7
+````
+
+### Conditional Branches
+
+<Info>
+Each decision point in the playbook is detailed below with its branch logic and downstream tasks.
+</Info>
+
+<AccordionGroup>
+  <Accordion title="Are there suppliers we didn't receive a reply from?" icon="code-branch">
+
+````mermaid
+graph TD
+    11{"Are there suppliers we didn't receive a "}
+    12["Set Supplier Incident Field to 'N/A'"]
+    7["Send Email Receipt "]
+    9(("Done"))
+    11 -->|Otherwise| 12
+    11 -->|Yes| 7
+    12 --> 7
+    7 --> 9
+    style 11 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Set Supplier Incident Field to "N/A"
+    - **Yes:** Send Email Receipt 
+
+  </Accordion>
+</AccordionGroup>
+
+## Prerequisites
+
+### Required Integrations
+
+<Warning>
+The following integrations must be configured and enabled before running this playbook:
+</Warning>
+
+- **EWSO365_testing**
+
+<Tip>
+Verify integration health in **Settings → Integrations** before execution.
+</Tip>
+
+### Required Sub-Playbooks
+
+<Info>
+This playbook calls the following sub-playbooks. Ensure they are available in your XSOAR instance:
+</Info>
+
+- `PS - Subplaybook: ScheduledJob Supplier Response Check`
+
+## Workflow
+
+<Steps>
+  <Step title="Initiate Incident Fields" icon="terminal">
+    commands.local.cmd.set.incident
+
+    **Executes Command:** `!setIncident`
+    **Full Path:** `Builtin|||setIncident`
+
+    <Accordion title="Command Arguments (1)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `suppliernoresponsereceived` | `` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Get Supplier Email" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Set a value in context under the key you entered.
+
+    **Executes Script:** `Set`
+
+    <Accordion title="Script Arguments (2)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `key` | `Supplier List` |
+    | `value` | `${lists.CSIRT Suppliers Email Communication}` → `split(delimiter={'value': {'simple': ','}})` → `StringToArray()` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Get Today's Date" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Retrieves the current date and time.
+
+    **Executes Script:** `GetTime`
+
+  </Step>
+  <Step title="Format Today's Date" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    **Executes Script:** `ConvertXSOARDatetoEWSDate`
+
+    <Accordion title="Script Arguments (1)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `TodaysDate` | `${TimeNow}` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="PS - Subplaybook: ScheduledJob Supplier Response Check" icon="diagram-project">
+    <Tip>
+    **Calls Sub-Playbook:** `PS - Subplaybook: ScheduledJob Supplier Response Check`
+    
+    This sub-playbook shares the current context and can access all available data.
+    </Tip>
+
+    <Accordion title="Loop Configuration" icon="rotate">
+
+    | Setting | Value |
+    |---------|-------|
+    | Wait Between Iterations | 1 second(s) |
+    | Maximum Iterations | 100 |
+
+    </Accordion>
+
+    <Accordion title="Sub-Playbook Inputs" icon="right-to-bracket">
+
+    | Input Parameter | Value |
+    |-----------------|-------|
+    | `List Entry` | `${Supplier List}` → `replace(limit={})` → `replace(limit={})` +4 |
+    | `Today's Date` | `Formatted Todays Date` → `SetIfEmpty(applyIfEmpty={})` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Are there suppliers we didn't receive a reply from?" icon="code-branch">
+    <Tabs>
+      <Tab title="Otherwise">
+        **Proceeds to:** Set Supplier Incident Field to "N/A"
+      </Tab>
+      <Tab title="Yes">
+        **Proceeds to:** Send Email Receipt 
+      </Tab>
+    </Tabs>
+
+    <Accordion title="Condition Logic Details" icon="code">
+
+    **Branch: yes**
+
+    - `incident.suppliernoresponsereceived` **is not empty**
+
+    </Accordion>
+
+  </Step>
+  <Step title="Send Email Receipt" icon="terminal">
+    Sends an email.
+
+    **Executes Command:** `!send-mail`
+    **Integration:** EWSO365_testing
+    **Full Path:** `EWSO365_testing|||send-mail`
+
+    <Accordion title="Command Arguments (3)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `body` | `The scheduled job that checks if an email reply has been received from vendors for CSIRT has completed.   An email reminder for a reply has been sent to: ${incident.suppliernoresponsereceived}.   Please see #${incident.id} for more details.` |
+    | `subject` | `[#${incident.id}] Supplier Response Scheduled Job Check` |
+    | `to` | `leticia.gomes@mdlz.com` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Set Supplier Incident Field to &quot;N/A&quot;" icon="terminal">
+    commands.local.cmd.set.incident
+
+    **Executes Command:** `!setIncident`
+    **Full Path:** `Builtin|||setIncident`
+
+    <Accordion title="Command Arguments (1)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `suppliernoresponsereceived` | `N/A` |
+
+    </Accordion>
+
+  </Step>
+</Steps>
+
+## Integration Commands Reference
+
+<Note>
+This playbook executes the following integration commands:
+</Note>
+
+### EWSO365_testing
+
+- `!send-mail`
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="EWSO365_testing Integration" icon="plug">
+    Configure and manage the EWSO365_testing integration
+  </Card>
+  <Card title="PS - Subplaybook: ScheduledJob Supplier Response Check" icon="diagram-project">
+    View documentation for this sub-playbook
+  </Card>
+</CardGroup>
+
+<Tip>
+For more information about XSOAR playbooks and automation, refer to the [Cortex XSOAR Documentation](https://docs-cortex.paloaltonetworks.com/)
+</Tip>
+
+## Playbook Metadata
+
+| Property | Value |
+|----------|-------|
+| **Playbook ID** | `18e67c11-f448-4352-84db-2a7b9f68d68b` |
+| **Playbook Version** | 51 |
+| **Total Tasks** | 9 |
+| **Automated Steps** | 6 |
+| **Manual Decision Points** | 3 |

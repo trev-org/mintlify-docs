@@ -1,0 +1,659 @@
+---
+title: "PS - Sub Playbook: Add to Risk Matrix"
+description: "Security orchestration and automation playbook"
+sidebarTitle: "PS - Sub Playbook: Add to Risk Matrix"
+---
+
+## Overview
+
+This playbook automates security operations and response workflows.
+
+**Workflow characteristics:** 11 manual decision point(s)
+
+<CardGroup cols={2}>
+  <Card title="Manual Tasks" icon="user">
+    11 decision point(s)
+  </Card>
+  <Card title="Total Tasks" icon="list-check">
+    18 automated step(s)
+  </Card>
+</CardGroup>
+
+## Visual Flow
+
+### Overview
+
+<Note>
+The diagram below shows the high-level flow of this playbook. Decision points are shown as diamonds, and parallel branches are indicated where tasks split.
+</Note>
+
+````mermaid
+graph TD
+    0(["Start"])
+    16[\"Risk (event) Source Detection conditiona"/]
+    4{"Entity Field Populated?"}
+    12{"Check if Host is Server"}
+    20[\"Print message"/]
+    13{"VIP Host?"}
+    8[\"Set Impact Context Key (1.25)"/]
+    1[\"Add to Risk Matrix"/]
+    14[\"Delete Context"/]
+    15(("Done"))
+    9[\"Set Impact Context Key (1)"/]
+    19[\"Print Message"/]
+    6[\"Set Impact Context Key (1.5)"/]
+    10{"Is IP internal?"}
+    11[\"Set Impact Context Key (1.2)"/]
+    18[\"Print Message"/]
+    17[\"Print Message"/]
+    5{"Is it an A-, S-, G- account? "}
+    7{"Is incident VIP?"}
+    0 --> 16
+    16 --> 4
+    4 -->|Hostname| 12
+    4 -->|IP| 10
+    4 -->|Nothing Passed| 17
+    4 -->|User| 5
+    12 -->|Otherwise| 20
+    12 -->|domaincontrollerauth| 19
+    12 -->|false| 13
+    12 -->|true| 6
+    20 --> 13
+    13 -->|Otherwise| 9
+    13 -->|Yes| 8
+    8 --> 1
+    1 --> 14
+    14 --> 15
+    9 --> 1
+    6 --> 1
+    10 -->|Otherwise| 11
+    10 -->|Exclusion| 18
+    11 --> 1
+    5 -->|Otherwise| 7
+    5 -->|Yes| 6
+    7 -->|Otherwise| 9
+    7 -->|Yes| 8
+````
+
+### Conditional Branches
+
+<Info>
+Each decision point in the playbook is detailed below with its branch logic and downstream tasks.
+</Info>
+
+<AccordionGroup>
+  <Accordion title="Check Detection Name" icon="code-branch">
+
+````mermaid
+graph TD
+    3{"Check Detection Name"}
+    style 3 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+
+  </Accordion>
+  <Accordion title="Entity Field Populated?" icon="code-branch">
+
+````mermaid
+graph TD
+    4{"Entity Field Populated?"}
+    1[\"Add to Risk Matrix"/]
+    6[\"Set Impact Context Key (1.5)"/]
+    10{"Is IP internal?"}
+    11[\"Set Impact Context Key (1.2)"/]
+    17[\"Print Message"/]
+    12{"Check if Host is Server"}
+    13{"VIP Host?"}
+    20[\"Print message"/]
+    7{"Is incident VIP?"}
+    5{"Is it an A-, S-, G- account? "}
+    19[\"Print Message"/]
+    18[\"Print Message"/]
+    4 -->|Hostname| 12
+    4 -->|IP| 10
+    4 -->|Nothing Passed| 17
+    4 -->|User| 5
+    6 --> 1
+    10 -->|Otherwise| 11
+    10 -->|Exclusion| 18
+    11 --> 1
+    12 -->|Otherwise| 20
+    12 -->|domaincontrollerauth| 19
+    12 -->|false| 13
+    12 -->|true| 6
+    20 --> 13
+    5 -->|Otherwise| 7
+    5 -->|Yes| 6
+    style 4 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Hostname:** Check if Host is Server
+    - **Ip:** Is IP internal?
+    - **Nothing Passed:** Print Message
+    - **User:** Is it an A-, S-, G- account? 
+
+  </Accordion>
+  <Accordion title="Is it an A-, S-, G- account?" icon="code-branch">
+
+````mermaid
+graph TD
+    5{"Is it an A-, S-, G- account? "}
+    1[\"Add to Risk Matrix"/]
+    8[\"Set Impact Context Key (1.25)"/]
+    7{"Is incident VIP?"}
+    14[\"Delete Context"/]
+    6[\"Set Impact Context Key (1.5)"/]
+    9[\"Set Impact Context Key (1)"/]
+    5 -->|Otherwise| 7
+    5 -->|Yes| 6
+    1 --> 14
+    8 --> 1
+    7 -->|Otherwise| 9
+    7 -->|Yes| 8
+    6 --> 1
+    9 --> 1
+    style 5 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Is incident VIP?
+    - **Yes:** Set Impact Context Key (1.5)
+
+  </Accordion>
+  <Accordion title="Is incident VIP?" icon="code-branch">
+
+````mermaid
+graph TD
+    7{"Is incident VIP?"}
+    1[\"Add to Risk Matrix"/]
+    8[\"Set Impact Context Key (1.25)"/]
+    14[\"Delete Context"/]
+    9[\"Set Impact Context Key (1)"/]
+    7 -->|Otherwise| 9
+    7 -->|Yes| 8
+    1 --> 14
+    8 --> 1
+    9 --> 1
+    style 7 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Set Impact Context Key (1)
+    - **Yes:** Set Impact Context Key (1.25)
+
+  </Accordion>
+  <Accordion title="Is IP internal?" icon="code-branch">
+
+````mermaid
+graph TD
+    10{"Is IP internal?"}
+    1[\"Add to Risk Matrix"/]
+    18[\"Print Message"/]
+    11[\"Set Impact Context Key (1.2)"/]
+    14[\"Delete Context"/]
+    10 -->|Otherwise| 11
+    10 -->|Exclusion| 18
+    1 --> 14
+    11 --> 1
+    style 10 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Set Impact Context Key (1.2)
+    - **Exclusion:** Print Message
+
+  </Accordion>
+  <Accordion title="Check if Host is Server" icon="code-branch">
+
+````mermaid
+graph TD
+    12{"Check if Host is Server"}
+    1[\"Add to Risk Matrix"/]
+    8[\"Set Impact Context Key (1.25)"/]
+    6[\"Set Impact Context Key (1.5)"/]
+    9[\"Set Impact Context Key (1)"/]
+    13{"VIP Host?"}
+    20[\"Print message"/]
+    14[\"Delete Context"/]
+    19[\"Print Message"/]
+    12 -->|Otherwise| 20
+    12 -->|domaincontrollerauth| 19
+    12 -->|false| 13
+    12 -->|true| 6
+    1 --> 14
+    8 --> 1
+    6 --> 1
+    9 --> 1
+    13 -->|Otherwise| 9
+    13 -->|Yes| 8
+    20 --> 13
+    style 12 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Print message
+    - **Domaincontrollerauth:** Print Message
+    - **False:** VIP Host?
+    - **True:** Set Impact Context Key (1.5)
+
+  </Accordion>
+  <Accordion title="VIP Host?" icon="code-branch">
+
+````mermaid
+graph TD
+    13{"VIP Host?"}
+    1[\"Add to Risk Matrix"/]
+    8[\"Set Impact Context Key (1.25)"/]
+    14[\"Delete Context"/]
+    9[\"Set Impact Context Key (1)"/]
+    13 -->|Otherwise| 9
+    13 -->|Yes| 8
+    1 --> 14
+    8 --> 1
+    9 --> 1
+    style 13 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Set Impact Context Key (1)
+    - **Yes:** Set Impact Context Key (1.25)
+
+  </Accordion>
+</AccordionGroup>
+
+## Inputs
+
+<Info>
+Configure these inputs when running the playbook to customize its behavior.
+</Info>
+
+| Name | Required | Type | Description | Default Source |
+|------|----------|------|-------------|----------------|
+| `entityType` | ❌ No | string | *No description provided* | - |
+| `entity` | ❌ No | string | *No description provided* | - |
+
+## Workflow
+
+<Steps>
+  <Step title="Risk &#40;event&#41; Source Detection conditional?" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    **Executes Script:** `RBA_Detection_Check`
+
+    <Accordion title="Script Arguments (1)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `detection` | `incident.detectionname` → `SetIfEmpty(applyIfEmpty={})` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Entity Field Populated?" icon="code-branch">
+    <Tabs>
+      <Tab title="Hostname">
+        **Proceeds to:** Check if Host is Server
+      </Tab>
+      <Tab title="Ip">
+        **Proceeds to:** Is IP internal?
+      </Tab>
+      <Tab title="Nothing Passed">
+        **Proceeds to:** Print Message
+      </Tab>
+      <Tab title="User">
+        **Proceeds to:** Is it an A-, S-, G- account? 
+      </Tab>
+    </Tabs>
+
+    <Accordion title="Condition Logic Details" icon="code">
+
+    **Branch: User**
+
+    - `inputs.entityType` **equals** `user`
+
+    **AND**
+
+    - `inputs.entity` **is not empty**
+
+    **Branch: Hostname**
+
+    - `inputs.entityType` **equals** `host`
+
+    **AND**
+
+    - `inputs.entity` **is not empty**
+
+    **Branch: IP**
+
+    - `inputs.entityType` **equals** `ip`
+
+    **AND**
+
+    - `inputs.entity` **is not empty**
+
+    **Branch: Nothing Passed**
+
+    - `inputs.entity` **is empty**
+
+    </Accordion>
+
+  </Step>
+  <Step title="Check if Host is Server" icon="code-branch">
+    **Evaluates:**
+    - `detectionname`: `incident.detectionname` → `SetIfEmpty(applyIfEmpty={})`
+    - `hostname`: `${inputs.entity}`
+
+    <Tabs>
+      <Tab title="Otherwise">
+        **Proceeds to:** Print message
+      </Tab>
+      <Tab title="Domaincontrollerauth">
+        **Proceeds to:** Print Message
+      </Tab>
+      <Tab title="False">
+        **Proceeds to:** VIP Host?
+      </Tab>
+      <Tab title="True">
+        **Proceeds to:** Set Impact Context Key (1.5)
+      </Tab>
+    </Tabs>
+
+  </Step>
+  <Step title="Print message" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Prints text to war room (Markdown supported)
+
+    **Executes Script:** `Print`
+
+    <Accordion title="Script Arguments (1)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `value` | `Unknown if host is server` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="VIP Host?" icon="code-branch">
+    <Tabs>
+      <Tab title="Otherwise">
+        **Proceeds to:** Set Impact Context Key (1)
+      </Tab>
+      <Tab title="Yes">
+        **Proceeds to:** Set Impact Context Key (1.25)
+      </Tab>
+    </Tabs>
+
+    <Accordion title="Condition Logic Details" icon="code">
+
+    **Branch: yes**
+
+    - `incident.viphost` **equals** `yes`
+
+    </Accordion>
+
+  </Step>
+  <Step title="Set Impact Context Key &#40;1.25&#41;" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Set a value in context under the key you entered.
+
+    **Executes Script:** `Set`
+
+    <Accordion title="Script Arguments (2)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `key` | `impact` |
+    | `value` | `1.25` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Add to Risk Matrix" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    **Executes Script:** `RBA-Add-to-Risk-Matrix`
+
+    <Accordion title="Script Arguments (10)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `entity` | `inputs.entity` → `splitAndTrim(delimiter={'value': {'simple': ','}})` |
+    | `entityType` | `${inputs.entityType}` |
+    | `impact` | `${impact}` |
+    | `incidentID` | `${incident.id}` |
+    | `origRiskLevel` | `incident.labels.alert\.severity` → `SetIfEmpty(applyIfEmpty={})` → `dbea7c93-733f-4c87-8a40-6d430c5afca3()` |
+    | `relevance` | `${RelevanceScore}` |
+    | `riskSource` | `incident.detectionname` → `SetIfEmpty(applyIfEmpty={})` |
+    | `riskTime` | `${incident.occurred}` |
+    | `status` | `${incident.status}` |
+    | `tp_rate` | `${TPRateScore}` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Delete Context" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Delete field from context.
+    This automation runs using the default Limited User role, unless you explicitly change the permissions.
+    For more information, see the section about permissions here:
+    - For Cortex XSOAR 6 see https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/6.x/Cortex-XSOAR-Playbook-Design-Guide/Automations
+    - For Cortex XSOAR 8 Cloud see https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/8/Cortex-XSOAR-Cloud-Documentation/Create-a-script
+    - For Cortex XSOAR 8.7 On-prem see https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/8.7/Cortex-XSOAR-On-prem-Documentation/Create-a-script
+
+    **Executes Script:** `DeleteContext`
+
+    <Accordion title="Script Arguments (3)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `all` | `yes` |
+    | `keysToKeep` | `${inputs.entity}` |
+    | `subplaybook` | `yes` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Set Impact Context Key &#40;1&#41;" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Set a value in context under the key you entered.
+
+    **Executes Script:** `Set`
+
+    <Accordion title="Script Arguments (2)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `key` | `impact` |
+    | `value` | `1` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Print Message" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Prints text to war room (Markdown supported)
+
+    **Executes Script:** `Print`
+
+    <Accordion title="Script Arguments (1)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `value` | `${inputs.entity} was part of exclusion as it is a domain controller and the detection was ${incident.detectionname}. ${inputs.entity} not added to risk matrix` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Set Impact Context Key &#40;1.5&#41;" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Set a value in context under the key you entered.
+
+    **Executes Script:** `Set`
+
+    <Accordion title="Script Arguments (2)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `key` | `impact` |
+    | `value` | `1.5` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Is IP internal?" icon="code-branch">
+    <Tabs>
+      <Tab title="Otherwise">
+        **Proceeds to:** Set Impact Context Key (1.2)
+      </Tab>
+      <Tab title="Exclusion">
+        **Proceeds to:** Print Message
+      </Tab>
+    </Tabs>
+
+    <Accordion title="Condition Logic Details" icon="code">
+
+    **Branch: Exclusion**
+
+    - `lists.RBA_Exclude_IP` **contains** `inputs.entity`
+
+    </Accordion>
+
+  </Step>
+  <Step title="Set Impact Context Key &#40;1.2&#41;" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Set a value in context under the key you entered.
+
+    **Executes Script:** `Set`
+
+    <Accordion title="Script Arguments (2)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `key` | `impact` |
+    | `value` | `1.2` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Print Message" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Prints text to war room (Markdown supported)
+
+    **Executes Script:** `Print`
+
+    <Accordion title="Script Arguments (1)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `value` | `${inputs.entity} was part of exclusion list, ${inputs.entity} not added to risk matrix` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Print Message" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Prints text to war room (Markdown supported)
+
+    **Executes Script:** `Print`
+
+    <Accordion title="Script Arguments (1)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `value` | `No entity was passed. Please check the inputs.` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Is it an A-, S-, G- account?" icon="code-branch">
+    <Tabs>
+      <Tab title="Otherwise">
+        **Proceeds to:** Is incident VIP?
+      </Tab>
+      <Tab title="Yes">
+        **Proceeds to:** Set Impact Context Key (1.5)
+      </Tab>
+    </Tabs>
+
+    <Accordion title="Condition Logic Details" icon="code">
+
+    **Branch: yes**
+
+    - `incident.users` **startWith** `s-`
+    - `incident.users` **startWith** `g-`
+    - `incident.users` **startWith** `a-`
+
+    </Accordion>
+
+  </Step>
+  <Step title="Is incident VIP?" icon="code-branch">
+    <Tabs>
+      <Tab title="Otherwise">
+        **Proceeds to:** Set Impact Context Key (1)
+      </Tab>
+      <Tab title="Yes">
+        **Proceeds to:** Set Impact Context Key (1.25)
+      </Tab>
+    </Tabs>
+
+    <Accordion title="Condition Logic Details" icon="code">
+
+    **Branch: yes**
+
+    - `incident.vip` **equals** `yes`
+
+    </Accordion>
+
+  </Step>
+</Steps>
+
+## Playbook Metadata
+
+| Property | Value |
+|----------|-------|
+| **Playbook ID** | `6a23e9dc-d15c-4c2d-8432-6b96aca2cf8e` |
+| **Playbook Version** | 8 |
+| **Total Tasks** | 18 |
+| **Automated Steps** | 7 |
+| **Manual Decision Points** | 11 |

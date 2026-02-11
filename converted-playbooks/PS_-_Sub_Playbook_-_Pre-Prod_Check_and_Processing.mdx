@@ -1,0 +1,554 @@
+---
+title: "PS - Sub Playbook - Pre-Prod Check and Processing"
+description: "Automates security operations using AsanaConnect_Updated"
+sidebarTitle: "PS - Sub Playbook - Pre-Prod Check an..."
+---
+
+## Overview
+
+This playbook automates security operations and response workflows.
+
+**Integrations used:** AsanaConnect_Updated
+
+**Workflow characteristics:** 1 manual decision point(s), 1 sub-playbook(s)
+
+<CardGroup cols={3}>
+  <Card title="Integrations" icon="plug">
+    1 integration(s) required
+  </Card>
+  <Card title="Sub-Playbooks" icon="diagram-project">
+    1 nested playbook(s)
+  </Card>
+  <Card title="Commands" icon="terminal">
+    3 unique command(s)
+  </Card>
+  <Card title="Manual Tasks" icon="user">
+    1 decision point(s)
+  </Card>
+  <Card title="Total Tasks" icon="list-check">
+    19 automated step(s)
+  </Card>
+</CardGroup>
+
+## Visual Flow
+
+### Overview
+
+<Note>
+The diagram below shows the high-level flow of this playbook. Decision points are shown as diamonds, and parallel branches are indicated where tasks split.
+</Note>
+
+````mermaid
+graph TD
+    0(["Start"])
+    23{"NGSIEM Webhook?"}
+    24[\"Parse rawJSON"/]
+    12[/"PS - Sub Playbook: Crowdstrike Host enri"\]
+    2["Get Asana Tickets in Pre-Prod Section"]
+    20{"giveandgo?"}
+    15{"Does task exist?"}
+    6["Append Title"]
+    7["Set Incident"]
+    4(("Done"))
+    8["Set Incident"]
+    21["Format Alert Name: GnG - Alert Name"]
+    22{"Does task exist?"}
+    13["Append Title"]
+    14["Set Incident"]
+    10["Set Incident"]
+    17["Set Incident"]
+    18["Set Incident"]
+    0 --> 23
+    23 -->|Otherwise| 12
+    23 -->|Yes| 24
+    24 --> 12
+    12 --> 2
+    2 --> 20
+    20 -->|false| 15
+    20 -->|true| 21
+    15 -->|Otherwise| 8
+    15 -->|Yes| 6
+    6 --> 7
+    7 --> 4
+    8 --> 4
+    21 --> 22
+    22 -->|Otherwise| 17
+    22 -->|Yes| 13
+    13 --> 14
+    14 --> 10
+    10 --> 4
+    17 --> 18
+    18 --> 4
+````
+
+### Conditional Branches
+
+<Info>
+Each decision point in the playbook is detailed below with its branch logic and downstream tasks.
+</Info>
+
+<AccordionGroup>
+  <Accordion title="Does task exist?" icon="code-branch">
+
+````mermaid
+graph TD
+    15{"Does task exist?"}
+    8["Set Incident"]
+    7["Set Incident"]
+    4(("Done"))
+    6["Append Title"]
+    15 -->|Otherwise| 8
+    15 -->|Yes| 6
+    8 --> 4
+    7 --> 4
+    6 --> 7
+    style 15 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Set Incident
+    - **Yes:** Append Title
+
+  </Accordion>
+  <Accordion title="Is detection cs_fdr?" icon="code-branch">
+
+````mermaid
+graph TD
+    16{"Is detection cs_fdr?"}
+    style 16 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+
+  </Accordion>
+  <Accordion title="giveandgo?" icon="code-branch">
+
+````mermaid
+graph TD
+    20{"giveandgo?"}
+    8["Set Incident"]
+    7["Set Incident"]
+    6["Append Title"]
+    15{"Does task exist?"}
+    4(("Done"))
+    22{"Does task exist?"}
+    21["Format Alert Name: GnG - Alert Name"]
+    20 -->|false| 15
+    20 -->|true| 21
+    8 --> 4
+    7 --> 4
+    6 --> 7
+    15 -->|Otherwise| 8
+    15 -->|Yes| 6
+    21 --> 22
+    style 20 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **False:** Does task exist?
+    - **True:** Format Alert Name: GnG - Alert Name
+
+  </Accordion>
+  <Accordion title="Does task exist?" icon="code-branch">
+
+````mermaid
+graph TD
+    22{"Does task exist?"}
+    13["Append Title"]
+    14["Set Incident"]
+    4(("Done"))
+    10["Set Incident"]
+    18["Set Incident"]
+    17["Set Incident"]
+    22 -->|Otherwise| 17
+    22 -->|Yes| 13
+    13 --> 14
+    14 --> 10
+    10 --> 4
+    18 --> 4
+    17 --> 18
+    style 22 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Set Incident
+    - **Yes:** Append Title
+
+  </Accordion>
+  <Accordion title="NGSIEM Webhook?" icon="code-branch">
+
+````mermaid
+graph TD
+    23{"NGSIEM Webhook?"}
+    12[/"PS - Sub Playbook: Crowdstrike Host enri"\]
+    2["Get Asana Tickets in Pre-Prod Section"]
+    20{"giveandgo?"}
+    24[\"Parse rawJSON"/]
+    23 -->|Otherwise| 12
+    23 -->|Yes| 24
+    12 --> 2
+    2 --> 20
+    24 --> 12
+    style 23 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** PS - Sub Playbook: Crowdstrike Host enrichment
+    - **Yes:** Parse rawJSON
+
+  </Accordion>
+</AccordionGroup>
+
+## Prerequisites
+
+### Required Integrations
+
+<Warning>
+The following integrations must be configured and enabled before running this playbook:
+</Warning>
+
+- **AsanaConnect_Updated**
+
+<Tip>
+Verify integration health in **Settings → Integrations** before execution.
+</Tip>
+
+### Required Sub-Playbooks
+
+<Info>
+This playbook calls the following sub-playbooks. Ensure they are available in your XSOAR instance:
+</Info>
+
+- `PS - Sub Playbook: Crowdstrike Host enrichment`
+
+## Inputs
+
+<Info>
+Configure these inputs when running the playbook to customize its behavior.
+</Info>
+
+| Name | Required | Type | Description | Default Source |
+|------|----------|------|-------------|----------------|
+| `Detection name` | ❌ No | string | *No description provided* | - |
+| `Detection Title` | ❌ No | string | *No description provided* | - |
+| `Hostnames` | ❌ No | string | *No description provided* | - |
+
+## Workflow
+
+<Steps>
+  <Step title="NGSIEM Webhook?" icon="code-branch">
+    <Tabs>
+      <Tab title="Otherwise">
+        **Proceeds to:** PS - Sub Playbook: Crowdstrike Host enrichment
+      </Tab>
+      <Tab title="Yes">
+        **Proceeds to:** Parse rawJSON
+      </Tab>
+    </Tabs>
+
+    <Accordion title="Condition Logic Details" icon="code">
+
+    **Branch: yes**
+
+    - `incident.sourceInstance` **equals** `ngsiem_webhook`
+
+    </Accordion>
+
+  </Step>
+  <Step title="Parse rawJSON" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    **Executes Script:** `NGSIEM_parse_rawJSON`
+
+  </Step>
+  <Step title="PS - Sub Playbook: Crowdstrike Host enrichment" icon="diagram-project">
+    <Tip>
+    **Calls Sub-Playbook:** `PS - Sub Playbook: Crowdstrike Host enrichment`
+    
+    This sub-playbook runs in an isolated context. Data must be explicitly passed via inputs and outputs.
+    </Tip>
+
+    <Accordion title="Loop Configuration" icon="rotate">
+
+    | Setting | Value |
+    |---------|-------|
+    | Wait Between Iterations | 1 second(s) |
+    | Maximum Iterations | 100 |
+
+    </Accordion>
+
+    <Accordion title="Sub-Playbook Inputs" icon="right-to-bracket">
+
+    | Input Parameter | Value |
+    |-----------------|-------|
+    | `Agent ID` | `${incident.labels.host\.id}` |
+    | `Host Name` | `inputs.Hostnames` → `RegexReplace(action_dt={})` |
+    | `MacAddress` | `${incident.macaddress}` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Get Asana Tickets in Pre-Prod Section" icon="terminal">
+    **Executes Command:** `!asana-get-tasks-in-section`
+    **Integration:** AsanaConnect_Updated
+    **Full Path:** `AsanaConnect_Updated|||asana-get-tasks-in-section`
+
+    <Accordion title="Command Arguments (1)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `section_id` | `1209498117806337` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="giveandgo?" icon="code-branch">
+    <Tabs>
+      <Tab title="False">
+        **Proceeds to:** Does task exist?
+      </Tab>
+      <Tab title="True">
+        **Proceeds to:** Format Alert Name: GnG - Alert Name
+      </Tab>
+    </Tabs>
+
+  </Step>
+  <Step title="Does task exist?" icon="code-branch">
+    <Tabs>
+      <Tab title="Otherwise">
+        **Proceeds to:** Set Incident
+      </Tab>
+      <Tab title="Yes">
+        **Proceeds to:** Append Title
+      </Tab>
+    </Tabs>
+
+    <Accordion title="Condition Logic Details" icon="code">
+
+    **Branch: yes**
+
+    - `asana.name` **contains** `inputs.Detection name`
+
+    </Accordion>
+
+  </Step>
+  <Step title="Append Title" icon="gear">
+    Set a value in context under the key you entered. If no value is entered, the script doesn't do anything.
+    This automation runs using the default Limited User role, unless you explicitly change the permissions.
+    For more information, see the section about permissions here:
+    - For Cortex XSOAR 6 see https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/6.x/Cortex-XSOAR-Playbook-Design-Guide/Automations
+    - For Cortex XSOAR 8 Cloud see https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/8/Cortex-XSOAR-Cloud-Documentation/Create-a-script
+    - For Cortex XSOAR 8.7 On-prem see https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/8.7/Cortex-XSOAR-On-prem-Documentation/Create-a-script
+
+    **Executes Script:** `SetAndHandleEmpty`
+
+    <Accordion title="Script Arguments (2)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `key` | `AppendedTitle` |
+    | `value` | `incident.name` → `concat(prefix={'value': {'simple': 'PreProd - '}})` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Set Incident" icon="terminal">
+    commands.local.cmd.set.incident
+
+    **Executes Command:** `!setIncident`
+    **Full Path:** `Builtin|||setIncident`
+
+    <Accordion title="Command Arguments (3)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `alertname` | `${AppendedTitle}` |
+    | `alertstatus` | `PreProd` |
+    | `severity` | `low` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Set Incident" icon="terminal">
+    commands.local.cmd.set.incident
+
+    **Executes Command:** `!setIncident`
+    **Full Path:** `Builtin|||setIncident`
+
+    <Accordion title="Command Arguments (1)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `alertstatus` | `Prod` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Format Alert Name: GnG - Alert Name" icon="terminal">
+    commands.local.cmd.set.incident
+
+    **Executes Command:** `!setIncident`
+    **Full Path:** `Builtin|||setIncident`
+
+    <Accordion title="Command Arguments (1)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `name` | `incident.name` → `SetIfEmpty(applyIfEmpty={})` → `ConcatFormat(ctx_data={})` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Does task exist?" icon="code-branch">
+    <Tabs>
+      <Tab title="Otherwise">
+        **Proceeds to:** Set Incident
+      </Tab>
+      <Tab title="Yes">
+        **Proceeds to:** Append Title
+      </Tab>
+    </Tabs>
+
+    <Accordion title="Condition Logic Details" icon="code">
+
+    **Branch: yes**
+
+    - `asana.name` **contains** `inputs.Detection name`
+
+    </Accordion>
+
+  </Step>
+  <Step title="Append Title" icon="gear">
+    Set a value in context under the key you entered. If no value is entered, the script doesn't do anything.
+    This automation runs using the default Limited User role, unless you explicitly change the permissions.
+    For more information, see the section about permissions here:
+    - For Cortex XSOAR 6 see https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/6.x/Cortex-XSOAR-Playbook-Design-Guide/Automations
+    - For Cortex XSOAR 8 Cloud see https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/8/Cortex-XSOAR-Cloud-Documentation/Create-a-script
+    - For Cortex XSOAR 8.7 On-prem see https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/8.7/Cortex-XSOAR-On-prem-Documentation/Create-a-script
+
+    **Executes Script:** `SetAndHandleEmpty`
+
+    <Accordion title="Script Arguments (2)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `key` | `AppendedTitle` |
+    | `value` | `incident.name` → `concat(prefix={'value': {'simple': 'PreProd - '}})` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Set Incident" icon="terminal">
+    commands.local.cmd.set.incident
+
+    **Executes Command:** `!setIncident`
+    **Full Path:** `Builtin|||setIncident`
+
+    <Accordion title="Command Arguments (3)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `alertname` | `${AppendedTitle}` |
+    | `alertstatus` | `PreProd` |
+    | `severity` | `low` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Set Incident" icon="terminal">
+    commands.local.cmd.set.incident
+
+    **Executes Command:** `!setIncident`
+    **Full Path:** `Builtin|||setIncident`
+
+    <Accordion title="Command Arguments (6)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `businessunit` | `GiveandGo` |
+    | `businessunitsimpacted` | `Giveandgo` |
+    | `countries` | `Not Identified` |
+    | `locationsimpacted` | `Not Provided` |
+    | `region` | `${incident.locationsimpacted}` → `SetIfEmpty(applyIfEmpty={})` |
+    | `regions` | `${incident.locationsimpacted}` → `SetIfEmpty(applyIfEmpty={})` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Set Incident" icon="terminal">
+    commands.local.cmd.set.incident
+
+    **Executes Command:** `!setIncident`
+    **Full Path:** `Builtin|||setIncident`
+
+    <Accordion title="Command Arguments (1)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `alertstatus` | `Prod` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Set Incident" icon="terminal">
+    commands.local.cmd.set.incident
+
+    **Executes Command:** `!setIncident`
+    **Full Path:** `Builtin|||setIncident`
+
+    <Accordion title="Command Arguments (5)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `businessunit` | `GiveandGo` |
+    | `businessunitsimpacted` | `GiveandGo` |
+    | `countries` | `Not Identified` |
+    | `region` | `${incident.locationsimpacted}` → `SetIfEmpty(applyIfEmpty={})` |
+    | `regions` | `${incident.locationsimpacted}` → `SetIfEmpty(applyIfEmpty={})` |
+
+    </Accordion>
+
+  </Step>
+</Steps>
+
+## Integration Commands Reference
+
+<Note>
+This playbook executes the following integration commands:
+</Note>
+
+### AsanaConnect_Updated
+
+- `!asana-get-tasks-in-section`
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="AsanaConnect_Updated Integration" icon="plug">
+    Configure and manage the AsanaConnect_Updated integration
+  </Card>
+  <Card title="PS - Sub Playbook: Crowdstrike Host enrichment" icon="diagram-project">
+    View documentation for this sub-playbook
+  </Card>
+</CardGroup>
+
+<Tip>
+For more information about XSOAR playbooks and automation, refer to the [Cortex XSOAR Documentation](https://docs-cortex.paloaltonetworks.com/)
+</Tip>
+
+## Playbook Metadata
+
+| Property | Value |
+|----------|-------|
+| **Playbook ID** | `ee8e58bb-002f-4e5b-8557-3d163398ef69` |
+| **Playbook Version** | 28 |
+| **Total Tasks** | 19 |
+| **Automated Steps** | 18 |
+| **Manual Decision Points** | 1 |

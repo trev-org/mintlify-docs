@@ -1,0 +1,229 @@
+---
+title: "RBA-Add-to-Risk-Matrix"
+description: "XSOAR Script"
+sidebarTitle: "RBA-Add-to-Risk-Matrix"
+---
+
+## Overview
+
+This is an XSOAR script.
+
+<Note>
+**Content Type:** Script
+</Note>
+
+## Arguments
+
+| Name | Required | Description |
+|------|----------|-------------|
+| `entity` | No |  |
+| `incidentID` | No |  |
+| `entityType` | No |  |
+| `riskSource` | No |  |
+| `riskTime` | No |  |
+| `relevance` | No |  |
+| `origRiskLevel` | No |  |
+| `impact` | No |  |
+| `status` | No |  |
+| `tp_rate` | No |  |
+
+## Script Information
+
+| Property | Value |
+|----------|-------|
+| **Language** | python |
+| **Subtype** | python3 |
+| **Docker Image** | `demisto/python3:3.12.8.1983910` |
+| **Enabled** | Yes |
+
+<Accordion title="Script Source Code" icon="code">
+
+```python
+import json
+from datetime import datetime
+
+def isError(result):
+    # Basic error checker for executeCommand results
+    return isinstance(result, list) and result and result[0].get('Type') == 4
+
+def find_open_master_incident(entity, riskSource):
+    query = f'name:"Incident related to {entity}" and -status:2'
+    res = demisto.executeCommand("SearchIncidentsV2", {"query": query,"size": 1 })
+    if isError(res):
+        return None
+    try:
+        incident_content = res[0]['Contents'][0]['Contents']['data']
+        if incident_content:
+            incident_id = incident_content[0].get('id')
+            custom_fields = incident_content[0].get('CustomFields', {})
+            triggering_incidents = custom_fields.get('triggeringincidentstable', None)
+            return {
+                'incident_id': incident_id,
+                'triggering_incidents': triggering_incidents
+            }
+
+        else:
+            return None
+    except Exception as e:
+        demisto.error(f"Error processing incident data: {str(e)}")
+        demisto.results(f"Raw response: {res}")
+    return None
+
+def link_incident_to_master(master_id, child_incident_id):
+    result = demisto.executeCommand("linkIncidents", {"incidentId": master_id, "linkedIncidentIDs": child_incident_id})
+    if isError(result):
+        demisto.error(f"Failed to link incident {child_incident_id} to master {master_id}: {result}")
+    return result
+
+def main():
+
+
+    entityType = demisto.args().get("entityType")
+    entity = demisto.args().get("entity") #done
+    incidentID = demisto.args().get("incidentID") #done
+    riskSource = demisto.args().get("riskSource") or "unknown"
+    riskTime = demisto.args().get("riskTime") #done
+    relevance = float(demisto.args().get("relevance", 1))
+    originalRiskLevel = demisto.args().get("origRiskLevel") or "unknown"
+    impact = float(demisto.args().get("impact", 1))
+    status_arg = demisto.args().get("status", "0")
+    tp_rate = float(demisto.args().get("tp_rate", 1))
+    current_time = datetime.now().isoformat() #done
+    expire_time = 7  # days
+    risk_mapping = {
+        "low": 10,
+        "medium": 20,
+        "high": 40,
+        "unknown": 0,
+        "informational": 0
+    }
+    riskMapped = risk_mapping.get(originalRiskLevel.lower(), 0)
+    riskCalc = impact * riskMapped
+    riskCalc = int(riskCalc) if riskCalc.is_integer() else round(riskCalc, 2)
+    total_risk = relevance * riskCalc * tp_rate
+    total_risk = int(total_risk) if total_risk.is_integer() else round(total_risk, 2)
+
+    status = "Active" #incident is open when entity comes in. Another PB will handle status sync
+
+
+    results = find_open_master_incident(entity, riskSource)
+    if results:
+        master_incident_id = results['incident_id']
+
+        triggeringincidentstable = results['triggering_incidents']
+        # Link this incident to the open master and skip Risk Matrix
+        link_result = link_incident_to_master(master_incident_id, incidentID)
+        new_row = {
+            "Incident ID": incidentID,
+            "Detection": riskSource,
+            "Entity": entity,
+            "Impact": impact,
+            "Relevance": relevance,
+            "Mapped Risk": riskMapped,
+            "Entity Type": entityType,
+            "TP Rate": tp_rate,
+            "Total Risk": total_risk,
+            "Time": riskTime
+        }
+        table_data = triggeringincidentstable
+        if isinstance(table_data, str):
+            try:
+                table_data = json.loads(table_data)  # Parse the JSON string into a list
+                demisto.info("Parsed triggeringincidentstable from string to list.")
+            except json.JSONDecodeError:
+                demisto.error("Failed to parse triggeringincidentstable as JSON. Initializing as empty list.")
+                table_data = []
+        if table_data is None or not isinstance(table_data, list):
+            table_data = []
+        if any(row.get("Incident ID") == incidentID for row in table_data):
+            demisto.results(f"Incident ID {incidentID} already exists in triggeringincidentstable. Skipping addition.")
+        else:
+            table_data.append(new_row)
+            update_result = demisto.executeCommand("setIncident", {
+                "id": master_incident_id,
+                "customFields": {
+                    "triggeringincidentstable": table_data
+                }
+            })
+            if isError(update_result):
+                demisto.error(f"Failed to update triggeringincidentstable for master incident {master_incident_id}: {update_result}")
+            else:
+                demisto.results(f"Linked incident {incidentID} to open master incident {master_incident_id} for entity {entity}. Skipping Risk Matrix update.")
+        return
+
+    raw_list = demisto.executeCommand("getList", {"listName": "Risk Matrix"})[0].get("Contents", "")
+    risk_matrix = json.loads(raw_list) if raw_list else {}
+    if not isinstance(risk_matrix, dict):
+        risk_matrix = {}
+    if riskSource not in risk_matrix:
+        risk_matrix[riskSource]= {
+        "risk.relevance": relevance,
+        entity:{
+            incidentID:{
+                "Entity.impact": impact,
+                "Risk.level.original": originalRiskLevel,
+                "Risk.level.mapped": riskMapped,
+                "Risk.level.calculate": riskCalc,
+                "Total.risk": total_risk,
+                "Risk.entity.status": status,
+                "Incident.occured": riskTime,
+                "Entity.type": entityType,
+                "Entity.entered": current_time,
+                "Entity.expiration.days":expire_time,
+                "tp.rate": tp_rate,
+                "Close.reason.rate": 1,
+                "Close.reason": ""
+            },
+            "Overall.risk.score": total_risk
+        }
+    }
+    else:
+        detection_entry = risk_matrix[riskSource]
+        detection_entry["risk.relevance"] = relevance
+        if entity not in detection_entry:
+            detection_entry[entity] = {}
+        detection_entry[entity][incidentID]= {
+            "Entity.impact": impact,
+            "Risk.level.original": originalRiskLevel,
+            "Risk.level.mapped": riskMapped,
+            "Risk.level.calculate": riskCalc,
+            "Total.risk": total_risk,
+            "Risk.entity.status": status,
+            "Incident.occured": riskTime,
+            "Entity.type": entityType,
+            "Entity.entered": current_time,
+            "Entity.expiration.days":expire_time,
+            "tp.rate": tp_rate,
+            "Close.reason.rate": 1,
+            "Close.reason":""
+        }
+        overall_total_risk = 0
+        for key, val in detection_entry[entity].items():
+            if isinstance(val, dict) and "Total.risk" in val:
+                overall_total_risk += val["Total.risk"]
+
+        detection_entry[entity]["Overall.risk.score"] = round(overall_total_risk, 2)
+
+
+
+
+
+    # Set the list in XSOAR
+    compact_list = json.dumps(risk_matrix, indent=2, separators=(',', ': '))
+    #compact_list = json.dumps(risk_list, separators=(',', ': '))
+    demisto.executeCommand("setList", {"listName": "Risk Matrix", "listData": compact_list})
+    demisto.results("Added " + entity)
+
+if __name__ in ('__main__', '__builtin__', 'builtins'):
+    main()
+```
+
+</Accordion>
+
+## Metadata
+
+| Property | Value |
+|----------|-------|
+| **ID** | `02d83f0e-6dfc-4da2-87fe-ae0c124efd68` |
+| **Type** | Script |
+| **Version** | 14 |

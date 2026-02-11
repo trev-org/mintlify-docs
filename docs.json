@@ -11,59 +11,26 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Playbooks",
         "groups": [
           {
-            "group": "Getting started",
-            "pages": ["index", "quickstart", "development"]
-          },
-          {
-            "group": "Customization",
-            "pages": ["essentials/settings", "essentials/navigation"]
-          },
-          {
-            "group": "Writing content",
+            "group": "Playbooks",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "converted-playbooks/EWSO365_testing",
+              "converted-playbooks/mdlz-generic-post-process-v3",
+              "converted-playbooks/playbook-Recorded_Future_Entity_Enrichment",
+              "converted-playbooks/playbook-Recorded_Future_Hatching_Sandbox",
+              "converted-playbooks/playbook-Recorded_Future_Leaked_Credential_Alert_Handling",
+              "converted-playbooks/PS_-_CSIRT__Send_Supplier_Email_",
+              "converted-playbooks/PS_-_Main_-_Credential_Access",
+              "converted-playbooks/PS_-_ScheduledJob__Supplier_Response_Check",
+              "converted-playbooks/PS_-_Sub_Playbook__Add_to_Risk_Matrix (1)",
+              "converted-playbooks/PS_-_Sub_Playbook_-_Pre-Prod_Check_and_Processing",
+              "converted-playbooks/PS_-_Subplaybook__ScheduledJob_Supplier_Response_Check (1)",
+              "converted-playbooks/RBA-Add-to-Risk-Matrix (1)"
             ]
           }
         ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": ["api-reference/introduction"]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Sandbox",
-        "asyncapi": {
-          "source": "Websocket/asyncapi.yaml",
-          "directory": "Websocket"
-        }
       }
     ],
     "global": {

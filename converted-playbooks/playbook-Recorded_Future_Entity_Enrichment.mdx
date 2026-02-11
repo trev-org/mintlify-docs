@@ -1,0 +1,800 @@
+---
+title: "Recorded Future Entity Enrichment"
+description: "Enriches indicators and entities with threat intelligence data"
+sidebarTitle: "Recorded Future Entity Enrichment"
+---
+
+## Overview
+
+This playbook enriches indicators and entities with threat intelligence data from multiple sources.
+
+**Integrations used:** Recorded Future v2
+
+**Workflow characteristics:** parallel task execution
+
+<CardGroup cols={3}>
+  <Card title="Integrations" icon="plug">
+    1 integration(s) required
+  </Card>
+  <Card title="Commands" icon="terminal">
+    2 unique command(s)
+  </Card>
+  <Card title="Total Tasks" icon="list-check">
+    19 automated step(s)
+  </Card>
+</CardGroup>
+
+## Visual Flow
+
+### Overview
+
+<Note>
+The diagram below shows the high-level flow of this playbook. Decision points are shown as diamonds, and parallel branches are indicated where tasks split.
+</Note>
+
+````mermaid
+graph TD
+    0(["Start"])
+    44{"Is Recorded Future API enabled?"}
+    43["Check Indicator Extraction"]
+    25{"Is there a SHA256 hash?"}
+    33["Recorded Future SHA256 Intel"]
+    38["Recorded Future Link Research (SHA256)"]
+    7(("Done"))
+    29{"Is there a URL?"}
+    34["Recorded Future URL Intel"]
+    40["Recorded Future Link Research (URL)"]
+    27{"Is there a MD5 hash?"}
+    31["Recorded Future MD5 Intel"]
+    39["Recorded Future Link Research (MD5)"]
+    30{"Is there a IP?"}
+    36["Recorded Future IP Intel"]
+    42["Recorded Future Link Research (IP)"]
+    28{"Is there a Domain?"}
+    35["Recorded Future Domain Intel"]
+    41["Recorded Future Link Research (Domain)"]
+    26{"Is there a SHA1 hash?"}
+    32["Recorded Future SHA1 Intel"]
+    37["Recorded Future Link Research (SHA1)"]
+    0 --> 44
+    44 -->|Otherwise| 7
+    44 -->|Yes| 43
+    43 --> 25
+    43 --> 29
+    43 --> 27
+    43 --> 30
+    43 --> 28
+    43 --> 26
+    25 -->|Otherwise| 7
+    25 -->|Yes| 33
+    33 --> 38
+    38 --> 7
+    29 -->|Otherwise| 7
+    29 -->|Yes| 34
+    34 --> 40
+    40 --> 7
+    27 -->|Otherwise| 7
+    27 -->|Yes| 31
+    31 --> 39
+    39 --> 7
+    30 -->|Otherwise| 7
+    30 -->|Yes| 36
+    36 --> 42
+    42 --> 7
+    28 -->|Otherwise| 7
+    28 -->|Yes| 35
+    35 --> 41
+    41 --> 7
+    26 -->|Otherwise| 7
+    26 -->|Yes| 32
+    32 --> 37
+    37 --> 7
+````
+
+### Conditional Branches
+
+<Info>
+Each decision point in the playbook is detailed below with its branch logic and downstream tasks.
+</Info>
+
+<AccordionGroup>
+  <Accordion title="Is there a SHA256 hash?" icon="code-branch">
+
+````mermaid
+graph TD
+    25{"Is there a SHA256 hash?"}
+    33["Recorded Future SHA256 Intel"]
+    38["Recorded Future Link Research (SHA256)"]
+    7(("Done"))
+    25 -->|Otherwise| 7
+    25 -->|Yes| 33
+    33 --> 38
+    38 --> 7
+    style 25 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Done
+    - **Yes:** Recorded Future SHA256 Intel
+
+  </Accordion>
+  <Accordion title="Is there a SHA1 hash?" icon="code-branch">
+
+````mermaid
+graph TD
+    26{"Is there a SHA1 hash?"}
+    37["Recorded Future Link Research (SHA1)"]
+    7(("Done"))
+    32["Recorded Future SHA1 Intel"]
+    26 -->|Otherwise| 7
+    26 -->|Yes| 32
+    37 --> 7
+    32 --> 37
+    style 26 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Done
+    - **Yes:** Recorded Future SHA1 Intel
+
+  </Accordion>
+  <Accordion title="Is there a MD5 hash?" icon="code-branch">
+
+````mermaid
+graph TD
+    27{"Is there a MD5 hash?"}
+    31["Recorded Future MD5 Intel"]
+    39["Recorded Future Link Research (MD5)"]
+    7(("Done"))
+    27 -->|Otherwise| 7
+    27 -->|Yes| 31
+    31 --> 39
+    39 --> 7
+    style 27 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Done
+    - **Yes:** Recorded Future MD5 Intel
+
+  </Accordion>
+  <Accordion title="Is there a Domain?" icon="code-branch">
+
+````mermaid
+graph TD
+    28{"Is there a Domain?"}
+    7(("Done"))
+    41["Recorded Future Link Research (Domain)"]
+    35["Recorded Future Domain Intel"]
+    28 -->|Otherwise| 7
+    28 -->|Yes| 35
+    41 --> 7
+    35 --> 41
+    style 28 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Done
+    - **Yes:** Recorded Future Domain Intel
+
+  </Accordion>
+  <Accordion title="Is there a URL?" icon="code-branch">
+
+````mermaid
+graph TD
+    29{"Is there a URL?"}
+    34["Recorded Future URL Intel"]
+    40["Recorded Future Link Research (URL)"]
+    7(("Done"))
+    29 -->|Otherwise| 7
+    29 -->|Yes| 34
+    34 --> 40
+    40 --> 7
+    style 29 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Done
+    - **Yes:** Recorded Future URL Intel
+
+  </Accordion>
+  <Accordion title="Is there a IP?" icon="code-branch">
+
+````mermaid
+graph TD
+    30{"Is there a IP?"}
+    42["Recorded Future Link Research (IP)"]
+    7(("Done"))
+    36["Recorded Future IP Intel"]
+    30 -->|Otherwise| 7
+    30 -->|Yes| 36
+    42 --> 7
+    36 --> 42
+    style 30 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Done
+    - **Yes:** Recorded Future IP Intel
+
+  </Accordion>
+  <Accordion title="Is Recorded Future API enabled?" icon="code-branch">
+
+````mermaid
+graph TD
+    44{"Is Recorded Future API enabled?"}
+    27{"Is there a MD5 hash?"}
+    26{"Is there a SHA1 hash?"}
+    28{"Is there a Domain?"}
+    30{"Is there a IP?"}
+    7(("Done"))
+    29{"Is there a URL?"}
+    25{"Is there a SHA256 hash?"}
+    43["Check Indicator Extraction"]
+    44 -->|Otherwise| 7
+    44 -->|Yes| 43
+    27 -->|Otherwise| 7
+    26 -->|Otherwise| 7
+    28 -->|Otherwise| 7
+    30 -->|Otherwise| 7
+    29 -->|Otherwise| 7
+    25 -->|Otherwise| 7
+    43 --> 25
+    43 --> 29
+    43 --> 27
+    43 --> 30
+    43 --> 28
+    43 --> 26
+    style 44 fill:#FFD700
+````
+
+    **Branch Summary:**
+
+    - **Otherwise:** Done
+    - **Yes:** Check Indicator Extraction
+
+  </Accordion>
+</AccordionGroup>
+
+## Prerequisites
+
+### Required Integrations
+
+<Warning>
+The following integrations must be configured and enabled before running this playbook:
+</Warning>
+
+- **Recorded Future v2**
+
+<Tip>
+Verify integration health in **Settings → Integrations** before execution.
+</Tip>
+
+## Inputs
+
+<Info>
+Configure these inputs when running the playbook to customize its behavior.
+</Info>
+
+| Name | Required | Type | Description | Default Source |
+|------|----------|------|-------------|----------------|
+| `MD5` | ❌ No | file | File MD5 hash to enrich. | `File.MD5` |
+| `SHA256` | ❌ No | file | The file SHA256 hash to enrich. | `File.SHA256` |
+| `SHA1` | ❌ No | file | The file SHA1 hash to enrich. | `File.SHA1` |
+| `IP` | ❌ No | ip | The IP Address to enrich. | `IP.Address` |
+| `Domain` | ❌ No | domain | The Domain name to enrich. | `Domain.Name` |
+| `URL` | ❌ No | url | The URL to enrich. | `URL.Data` |
+
+### Input Details
+
+<AccordionGroup>
+  <Accordion title="MD5" icon="database">
+
+    File MD5 hash to enrich.
+
+    **Value Derivation:**
+
+    ```
+    File.MD5
+    ```
+
+    **Transformation Pipeline:**
+    1. `uniq()`
+
+  </Accordion>
+  <Accordion title="SHA256" icon="database">
+
+    The file SHA256 hash to enrich.
+
+    **Value Derivation:**
+
+    ```
+    File.SHA256
+    ```
+
+    **Transformation Pipeline:**
+    1. `uniq()`
+
+  </Accordion>
+  <Accordion title="SHA1" icon="database">
+
+    The file SHA1 hash to enrich.
+
+    **Value Derivation:**
+
+    ```
+    File.SHA1
+    ```
+
+    **Transformation Pipeline:**
+    1. `uniq()`
+
+  </Accordion>
+  <Accordion title="IP" icon="database">
+
+    The IP Address to enrich.
+
+    **Value Derivation:**
+
+    ```
+    IP.Address
+    ```
+
+  </Accordion>
+  <Accordion title="Domain" icon="database">
+
+    The Domain name to enrich.
+
+    **Value Derivation:**
+
+    ```
+    Domain.Name
+    ```
+
+  </Accordion>
+  <Accordion title="URL" icon="database">
+
+    The URL to enrich.
+
+    **Value Derivation:**
+
+    ```
+    URL.Data
+    ```
+
+  </Accordion>
+</AccordionGroup>
+
+## Workflow
+
+<AccordionGroup>
+  <Accordion title="Main Workflow" icon="list-check">
+    <Steps>
+      <Step title="Is Recorded Future API enabled?" icon="code-branch">
+        <Tabs>
+          <Tab title="Otherwise">
+            **Proceeds to:** Done
+          </Tab>
+          <Tab title="Yes">
+            **Proceeds to:** Check Indicator Extraction
+          </Tab>
+        </Tabs>
+
+        <Accordion title="Condition Logic Details" icon="code">
+
+        **Branch: yes**
+
+        - `modules.brand` **exists**
+
+        </Accordion>
+
+      </Step>
+    </Steps>
+  </Accordion>
+  <Accordion title="Check Indicator Extraction" icon="list-check">
+    <Steps>
+      <Step title="Is there a SHA256 hash?" icon="code-branch">
+        Check if there is a SHA256 hash in context.
+
+        **Evaluates:**
+        - `value`: `${File.SHA256}`
+
+        <Tabs>
+          <Tab title="Otherwise">
+            **Proceeds to:** Done
+          </Tab>
+          <Tab title="Yes">
+            **Proceeds to:** Recorded Future SHA256 Intel
+          </Tab>
+        </Tabs>
+
+        <Accordion title="Condition Logic Details" icon="code">
+
+        **Branch: yes**
+
+        - `inputs.SHA256` **exists**
+
+        </Accordion>
+
+      </Step>
+      <Step title="Recorded Future SHA256 Intel" icon="terminal">
+        Get threat intelligence for an IP, Domain, CVE, URL or File.
+
+        **Executes Command:** `!recordedfuture-intelligence`
+        **Integration:** Recorded Future v2
+        **Full Path:** `Recorded Future v2|||recordedfuture-intelligence`
+
+        <Accordion title="Command Arguments (4)" icon="terminal">
+
+        | Argument | Value |
+        |----------|-------|
+        | `entity` | `inputs.SHA256` |
+        | `entity_type` | `file` |
+        | `fetch_related_entities` | `no` |
+        | `fetch_riskyCIDRips` | `no` |
+
+        </Accordion>
+
+      </Step>
+      <Step title="Recorded Future Link Research &#40;SHA256&#41;" icon="terminal">
+        Get Insikt Group Research Links for an IP, Domain, CVE, URL or File.
+
+        **Executes Command:** `!recordedfuture-links`
+        **Integration:** Recorded Future v2
+        **Full Path:** `Recorded Future v2|||recordedfuture-links`
+
+        <Accordion title="Command Arguments (2)" icon="terminal">
+
+        | Argument | Value |
+        |----------|-------|
+        | `entity` | `inputs.SHA256` |
+        | `entity_type` | `file` |
+
+        </Accordion>
+
+      </Step>
+      <Step title="Is there a URL?" icon="code-branch">
+        Check if there is a SHA1 hash in context.
+
+        <Tabs>
+          <Tab title="Otherwise">
+            **Proceeds to:** Done
+          </Tab>
+          <Tab title="Yes">
+            **Proceeds to:** Recorded Future URL Intel
+          </Tab>
+        </Tabs>
+
+        <Accordion title="Condition Logic Details" icon="code">
+
+        **Branch: yes**
+
+        - `inputs.URL` **exists**
+
+        </Accordion>
+
+      </Step>
+      <Step title="Recorded Future URL Intel" icon="terminal">
+        Get threat intelligence for an IP, Domain, CVE, URL or File.
+
+        **Executes Command:** `!recordedfuture-intelligence`
+        **Integration:** Recorded Future v2
+        **Full Path:** `Recorded Future v2|||recordedfuture-intelligence`
+
+        <Accordion title="Command Arguments (4)" icon="terminal">
+
+        | Argument | Value |
+        |----------|-------|
+        | `entity` | `inputs.URL` |
+        | `entity_type` | `url` |
+        | `fetch_related_entities` | `no` |
+        | `fetch_riskyCIDRips` | `no` |
+
+        </Accordion>
+
+      </Step>
+      <Step title="Recorded Future Link Research &#40;URL&#41;" icon="terminal">
+        Get Insikt Group Research Links for an IP, Domain, CVE, URL or File.
+
+        **Executes Command:** `!recordedfuture-links`
+        **Integration:** Recorded Future v2
+        **Full Path:** `Recorded Future v2|||recordedfuture-links`
+
+        <Accordion title="Command Arguments (2)" icon="terminal">
+
+        | Argument | Value |
+        |----------|-------|
+        | `entity` | `inputs.URL` |
+        | `entity_type` | `url` |
+
+        </Accordion>
+
+      </Step>
+      <Step title="Is there a MD5 hash?" icon="code-branch">
+        Check if there is a SHA1 hash in context.
+
+        <Tabs>
+          <Tab title="Otherwise">
+            **Proceeds to:** Done
+          </Tab>
+          <Tab title="Yes">
+            **Proceeds to:** Recorded Future MD5 Intel
+          </Tab>
+        </Tabs>
+
+        <Accordion title="Condition Logic Details" icon="code">
+
+        **Branch: yes**
+
+        - `inputs.MD5` **exists**
+
+        </Accordion>
+
+      </Step>
+      <Step title="Recorded Future MD5 Intel" icon="terminal">
+        Get threat intelligence for an IP, Domain, CVE, URL or File.
+
+        **Executes Command:** `!recordedfuture-intelligence`
+        **Integration:** Recorded Future v2
+        **Full Path:** `Recorded Future v2|||recordedfuture-intelligence`
+
+        <Accordion title="Command Arguments (4)" icon="terminal">
+
+        | Argument | Value |
+        |----------|-------|
+        | `entity` | `inputs.MD5` |
+        | `entity_type` | `file` |
+        | `fetch_related_entities` | `no` |
+        | `fetch_riskyCIDRips` | `no` |
+
+        </Accordion>
+
+      </Step>
+      <Step title="Recorded Future Link Research &#40;MD5&#41;" icon="terminal">
+        Get Insikt Group Research Links for an IP, Domain, CVE, URL or File.
+
+        **Executes Command:** `!recordedfuture-links`
+        **Integration:** Recorded Future v2
+        **Full Path:** `Recorded Future v2|||recordedfuture-links`
+
+        <Accordion title="Command Arguments (2)" icon="terminal">
+
+        | Argument | Value |
+        |----------|-------|
+        | `entity` | `inputs.MD5` |
+        | `entity_type` | `file` |
+
+        </Accordion>
+
+      </Step>
+      <Step title="Is there a IP?" icon="code-branch">
+        Check if there is a SHA1 hash in context.
+
+        <Tabs>
+          <Tab title="Otherwise">
+            **Proceeds to:** Done
+          </Tab>
+          <Tab title="Yes">
+            **Proceeds to:** Recorded Future IP Intel
+          </Tab>
+        </Tabs>
+
+        <Accordion title="Condition Logic Details" icon="code">
+
+        **Branch: yes**
+
+        - `inputs.IP` **exists**
+
+        </Accordion>
+
+      </Step>
+      <Step title="Recorded Future IP Intel" icon="terminal">
+        Get threat intelligence for an IP, Domain, CVE, URL or File.
+
+        **Executes Command:** `!recordedfuture-intelligence`
+        **Integration:** Recorded Future v2
+        **Full Path:** `Recorded Future v2|||recordedfuture-intelligence`
+
+        <Accordion title="Command Arguments (4)" icon="terminal">
+
+        | Argument | Value |
+        |----------|-------|
+        | `entity` | `inputs.IP` |
+        | `entity_type` | `ip` |
+        | `fetch_related_entities` | `no` |
+        | `fetch_riskyCIDRips` | `no` |
+
+        </Accordion>
+
+      </Step>
+      <Step title="Recorded Future Link Research &#40;IP&#41;" icon="terminal">
+        Get Insikt Group Research Links for an IP, Domain, CVE, URL or File.
+
+        **Executes Command:** `!recordedfuture-links`
+        **Integration:** Recorded Future v2
+        **Full Path:** `Recorded Future v2|||recordedfuture-links`
+
+        <Accordion title="Command Arguments (2)" icon="terminal">
+
+        | Argument | Value |
+        |----------|-------|
+        | `entity` | `inputs.IP` |
+        | `entity_type` | `ip` |
+
+        </Accordion>
+
+      </Step>
+      <Step title="Is there a Domain?" icon="code-branch">
+        Check if there is a SHA1 hash in context.
+
+        <Tabs>
+          <Tab title="Otherwise">
+            **Proceeds to:** Done
+          </Tab>
+          <Tab title="Yes">
+            **Proceeds to:** Recorded Future Domain Intel
+          </Tab>
+        </Tabs>
+
+        <Accordion title="Condition Logic Details" icon="code">
+
+        **Branch: yes**
+
+        - `inputs.Domain` **exists**
+
+        </Accordion>
+
+      </Step>
+      <Step title="Recorded Future Domain Intel" icon="terminal">
+        Get threat intelligence for an IP, Domain, CVE, URL or File.
+
+        **Executes Command:** `!recordedfuture-intelligence`
+        **Integration:** Recorded Future v2
+        **Full Path:** `Recorded Future v2|||recordedfuture-intelligence`
+
+        <Accordion title="Command Arguments (4)" icon="terminal">
+
+        | Argument | Value |
+        |----------|-------|
+        | `entity` | `inputs.Domain` |
+        | `entity_type` | `domain` |
+        | `fetch_related_entities` | `no` |
+        | `fetch_riskyCIDRips` | `no` |
+
+        </Accordion>
+
+      </Step>
+      <Step title="Recorded Future Link Research &#40;Domain&#41;" icon="terminal">
+        Get Insikt Group Research Links for an IP, Domain, CVE, URL or File.
+
+        **Executes Command:** `!recordedfuture-links`
+        **Integration:** Recorded Future v2
+        **Full Path:** `Recorded Future v2|||recordedfuture-links`
+
+        <Accordion title="Command Arguments (2)" icon="terminal">
+
+        | Argument | Value |
+        |----------|-------|
+        | `entity` | `inputs.Domain` |
+        | `entity_type` | `domain` |
+
+        </Accordion>
+
+      </Step>
+      <Step title="Is there a SHA1 hash?" icon="code-branch">
+        Check if there is a SHA1 hash in context.
+
+        <Tabs>
+          <Tab title="Otherwise">
+            **Proceeds to:** Done
+          </Tab>
+          <Tab title="Yes">
+            **Proceeds to:** Recorded Future SHA1 Intel
+          </Tab>
+        </Tabs>
+
+        <Accordion title="Condition Logic Details" icon="code">
+
+        **Branch: yes**
+
+        - `inputs.SHA1` **exists**
+
+        </Accordion>
+
+      </Step>
+      <Step title="Recorded Future SHA1 Intel" icon="terminal">
+        Get threat intelligence for an IP, Domain, CVE, URL or File.
+
+        **Executes Command:** `!recordedfuture-intelligence`
+        **Integration:** Recorded Future v2
+        **Full Path:** `Recorded Future v2|||recordedfuture-intelligence`
+
+        <Accordion title="Command Arguments (4)" icon="terminal">
+
+        | Argument | Value |
+        |----------|-------|
+        | `entity` | `inputs.SHA1` |
+        | `entity_type` | `file` |
+        | `fetch_related_entities` | `no` |
+        | `fetch_riskyCIDRips` | `no` |
+
+        </Accordion>
+
+      </Step>
+      <Step title="Recorded Future Link Research &#40;SHA1&#41;" icon="terminal">
+        Get Insikt Group Research Links for an IP, Domain, CVE, URL or File.
+
+        **Executes Command:** `!recordedfuture-links`
+        **Integration:** Recorded Future v2
+        **Full Path:** `Recorded Future v2|||recordedfuture-links`
+
+        <Accordion title="Command Arguments (2)" icon="terminal">
+
+        | Argument | Value |
+        |----------|-------|
+        | `entity` | `inputs.SHA1` |
+        | `entity_type` | `file` |
+
+        </Accordion>
+
+      </Step>
+    </Steps>
+  </Accordion>
+</AccordionGroup>
+
+## Outputs
+
+<Check>
+After successful execution, the following data is available in the incident context:
+</Check>
+
+| Context Path | Type | Description |
+|--------------|------|-------------|
+| `DBotScore.Indicator` | `string` | The indicator that was tested. |
+| `DBotScore.Type` | `string` | The indicator type. |
+| `DBotScore` | `unknown` | The DBotScore object. |
+| `DBotScore.Vendor` | `string` | Vendor used to calculate the score. |
+| `DBotScore.Score` | `number` | The actual score. |
+
+<Tip>
+Access output data in subsequent tasks or playbooks using these context paths.
+</Tip>
+
+## Integration Commands Reference
+
+<Note>
+This playbook executes the following integration commands:
+</Note>
+
+### Recorded Future v2
+
+- `!recordedfuture-intelligence`
+- `!recordedfuture-links`
+
+## Related Resources
+
+<CardGroup cols={1}>
+  <Card title="Recorded Future v2 Integration" icon="plug">
+    Configure and manage the Recorded Future v2 integration
+  </Card>
+</CardGroup>
+
+<Tip>
+For more information about XSOAR playbooks and automation, refer to the [Cortex XSOAR Documentation](https://docs-cortex.paloaltonetworks.com/)
+</Tip>
+
+## Playbook Metadata
+
+| Property | Value |
+|----------|-------|
+| **Playbook ID** | `Recorded Future Entity Enrichment` |
+| **Minimum XSOAR Version** | 6.5.0 |
+| **Total Tasks** | 19 |
+| **Automated Steps** | 19 |
+| **Tests** | None configured |

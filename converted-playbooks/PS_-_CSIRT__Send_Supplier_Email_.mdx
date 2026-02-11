@@ -1,0 +1,267 @@
+---
+title: "PS - CSIRT: Send Supplier Email"
+description: "Automates security operations using EWSO365_testing"
+sidebarTitle: "PS - CSIRT: Send Supplier Email"
+---
+
+## Overview
+
+This playbook automates security operations and response workflows.
+
+**Integrations used:** EWSO365_testing
+
+**Workflow characteristics:** 3 manual decision point(s), 1 sub-playbook(s)
+
+<CardGroup cols={3}>
+  <Card title="Integrations" icon="plug">
+    1 integration(s) required
+  </Card>
+  <Card title="Sub-Playbooks" icon="diagram-project">
+    1 nested playbook(s)
+  </Card>
+  <Card title="Commands" icon="terminal">
+    2 unique command(s)
+  </Card>
+  <Card title="Manual Tasks" icon="user">
+    3 decision point(s)
+  </Card>
+  <Card title="Data Collection" icon="clipboard-list">
+    2 form(s)
+  </Card>
+  <Card title="Total Tasks" icon="list-check">
+    8 automated step(s)
+  </Card>
+</CardGroup>
+
+## Visual Flow
+
+### Overview
+
+<Note>
+The diagram below shows the high-level flow of this playbook. Decision points are shown as diamonds, and parallel branches are indicated where tasks split.
+</Note>
+
+````mermaid
+graph TD
+    0(["Start"])
+    2[\"Provide Supplier Email"/]
+    8[\"Provide Vendor's Name"/]
+    9[/"PS - Sub playbook: Format Incident Owner"\]
+    10[\"Reformat Vendor Name"/]
+    3["Send Supplier Email"]
+    5[\"Get Today's Date"/]
+    6[\"Format Today's Date"/]
+    4["Add Supplier Email to List"]
+    7(("Done"))
+    0 --> 2
+    2 --> 8
+    8 --> 9
+    9 --> 10
+    10 --> 3
+    3 --> 5
+    5 --> 6
+    6 --> 4
+    4 --> 7
+````
+
+## Prerequisites
+
+### Required Integrations
+
+<Warning>
+The following integrations must be configured and enabled before running this playbook:
+</Warning>
+
+- **EWSO365_testing**
+
+<Tip>
+Verify integration health in **Settings → Integrations** before execution.
+</Tip>
+
+### Required Sub-Playbooks
+
+<Info>
+This playbook calls the following sub-playbooks. Ensure they are available in your XSOAR instance:
+</Info>
+
+- `PS - Sub playbook: Format Incident Owner Name`
+
+## Workflow
+
+<Steps>
+  <Step title="Provide Supplier Email" icon="clipboard-list">
+    <Info>
+    **Data Collection:** This task gathers information from security analysts.
+    </Info>
+
+    **Form Title:** Provide Supplier Email
+
+    <Accordion title="Form Questions (1)" icon="clipboard-question">
+
+    **1. Please provide supplier Email** **[Required]**
+
+    - **Type:** `shortText`
+
+    </Accordion>
+
+    <Accordion title="Collection Settings" icon="gear">
+
+    | Setting | Value |
+    |---------|-------|
+    | Retry Attempts | 2 |
+    | Retry Interval | 360 seconds |
+    | Complete After | 1 reply/replies |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Provide Vendor's Name" icon="clipboard-list">
+    <Info>
+    **Data Collection:** This task gathers information from security analysts.
+    </Info>
+
+    **Form Title:** Vendor Name
+
+    <Accordion title="Form Questions (1)" icon="clipboard-question">
+
+    **1. Please provide the Vendor's Name** **[Required]**
+
+    - **Type:** `shortText`
+
+    </Accordion>
+
+    <Accordion title="Collection Settings" icon="gear">
+
+    | Setting | Value |
+    |---------|-------|
+    | Retry Attempts | 2 |
+    | Retry Interval | 360 seconds |
+    | Complete After | 1 reply/replies |
+
+    </Accordion>
+
+  </Step>
+  <Step title="PS - Sub playbook: Format Incident Owner Name" icon="diagram-project">
+    <Tip>
+    **Calls Sub-Playbook:** `PS - Sub playbook: Format Incident Owner Name`
+    
+    This sub-playbook runs in an isolated context. Data must be explicitly passed via inputs and outputs.
+    </Tip>
+
+  </Step>
+  <Step title="Reformat Vendor Name" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Set a value in context under the key you entered.
+
+    **Executes Script:** `Set`
+
+    <Accordion title="Script Arguments (2)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `key` | `${Vendor Name.Answers.0}` |
+    | `value` | `Vendor Name.Answers.0` → `replace(limit={})` → `replace(limit={})` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Send Supplier Email" icon="terminal">
+    Sends an email.
+
+    **Executes Command:** `!send-mail`
+    **Integration:** EWSO365_testing
+    **Full Path:** `EWSO365_testing|||send-mail`
+
+    <Accordion title="Command Arguments (3)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `body` | `Hi,  My name is ${incident.incidentowner}, and I am a part of the Mondelez Cybersecurity Incident Response Team (CSIRT). During routine monitoring, it was identified that files related to Mondelez and ${Vendor Name.Answers.0} operations have been leaked on a dedicated leak site.  In order to get a full scope of understanding, we have prepared the following list of questions we would like answered. These questions will help us determine if there is any concern or impact to MDLZ data and/or MDLZ systems.  Please feel free to forward these questions to any Security or IT Points of Contact (POCs), or to include them on this email thread.  1.	Was ${Vendor Name.Answers.0} victim of a cyber-attack and compromise? 2.	If so, what is the nature and scope of the incident?  3.	Has the root cause been identified? If so, please share.  4.	When was the incident discovered and reported?  5.	What are the potential risks and impacts on your organization and ours?  6.	Have affected accounts been reset?   7.	Are affected accounts being monitored?  8.	What steps have been taken to contain the incident? How will King Power Corporation handle incident response?  9.	How have you confirmed that an attacker was not able to move to another system in your environment or ones closely connected to yours?  10.	Are affected hosts being reimaged? If not, what steps have been taken to ensure they are no longer compromised?  11.	Was MDLZ data present or accessible to attackers at the time of compromise?  12.	Is there evidence that data was exfiltrated?  13.	How much MDLZ data was exfiltrated?   14.	Can we have a copy of our data for review?  15.	If there is an incident report available (or to be available in the future), can we have a copy?  a.	We would like a report to validate or provide a statement that the incident has been contained.  16.	What future safeguards are being put in place to protect MDLZ data in the future?  a.	Additional security endpoints?  b.	Establishment of a SOC?    We look forward to your responses.  Thank you, ${incident.incidentowner} Cybersecurity Incident Response Analyst Global MDS Cybersecurity Program` |
+    | `subject` | `${Vendor Name.Answers.0} Leaked Files` |
+    | `to` | `${Provide Supplier Email.Answers.0}` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Get Today's Date" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    Retrieves the current date and time.
+
+    **Executes Script:** `GetTime`
+
+  </Step>
+  <Step title="Format Today's Date" icon="user">
+    <Warning>
+    **Manual Task:** This step requires human intervention and decision-making.
+    </Warning>
+
+    **Executes Script:** `ConvertXSOARDatetoEWSDate`
+
+    <Accordion title="Script Arguments (1)" icon="code">
+
+    | Argument | Value |
+    |----------|-------|
+    | `TodaysDate` | `${TimeNow}` |
+
+    </Accordion>
+
+  </Step>
+  <Step title="Add Supplier Email to List" icon="terminal">
+    commands.local.cmd.list.add
+
+    **Executes Command:** `!addToList`
+    **Full Path:** `Builtin|||addToList`
+
+    <Accordion title="Command Arguments (2)" icon="terminal">
+
+    | Argument | Value |
+    |----------|-------|
+    | `listData` | `{${Provide Supplier Email.Answers.0}: ${Formatted Todays Date}}` |
+    | `listName` | `CSIRT Suppliers Email Communication` |
+
+    </Accordion>
+
+  </Step>
+</Steps>
+
+## Integration Commands Reference
+
+<Note>
+This playbook executes the following integration commands:
+</Note>
+
+### EWSO365_testing
+
+- `!send-mail`
+
+## Related Resources
+
+<CardGroup cols={2}>
+  <Card title="EWSO365_testing Integration" icon="plug">
+    Configure and manage the EWSO365_testing integration
+  </Card>
+  <Card title="PS - Sub playbook: Format Incident Owner Name" icon="diagram-project">
+    View documentation for this sub-playbook
+  </Card>
+</CardGroup>
+
+<Tip>
+For more information about XSOAR playbooks and automation, refer to the [Cortex XSOAR Documentation](https://docs-cortex.paloaltonetworks.com/)
+</Tip>
+
+## Playbook Metadata
+
+| Property | Value |
+|----------|-------|
+| **Playbook ID** | `67cc3899-ef53-40e4-8634-0492561174b2` |
+| **Playbook Version** | 59 |
+| **Total Tasks** | 8 |
+| **Automated Steps** | 3 |
+| **Manual Decision Points** | 3 |
+| **Data Collection Forms** | 2 |
